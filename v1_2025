@@ -1,0 +1,75 @@
+1. % Predicatul principal: primește o listă de perechi (N,M) și întoarce o listă de liste cu numerele din intervalele respective.
+
+expand_intervals([], []).  % Cazul de bază: lista goală ⇒ rezultat gol.
+
+expand_intervals([(N,M)|T], [Interval | R]) :-
+    build_list(N, M, Interval),        % Construim intervalul curent
+    expand_intervals(T, R).            % Recursiv pe restul listei
+
+% Predicat auxiliar: generează lista [N, N+1, ..., M] dacă N =< M, altfel [].
+
+build_list(N, M, []) :-
+    N > M, !.                          % Dacă N > M, lista e goală
+
+build_list(N, M, [N|Rest]) :-
+    N =< M,
+    N1 is N + 1,
+    build_list(N1, M, Rest).
+2.
+div_concat(L, R) :-
+    append(L1, L2, L),          % 1. spargem L în două segmente L1, L2
+    L1 \= [],                   %    (ambele trebuie să fie nenule,
+    L2 \= [],                   %     altfel L şi R ar fi identice)
+    append(L2, L1, R),          % 2. reconstruim R prin inversarea ordinii
+    L \= R,                     % 3. ne asigurăm că L şi R sunt diferite
+    length(L,  Len),            % 4. calculăm lungimile
+    length(L1, Len1),
+    length(L2, Len2),
+    (   (Len1 > 0, 0 is Len mod Len1)   % 5. testăm divizibilitatea
+    ;   (Len2 > 0, 0 is Len mod Len2)
+    ).
+
+
+3.
+a)
+flatten_and(Var, [Var]) :-               % Dacă e variabilă, lista e [Var]
+    atom(Var), !.
+
+flatten_and(si(X, Y), List) :-           % Dacă e o conjuncție, aplatizăm recursiv
+    flatten_and(X, LX),
+    flatten_and(Y, LY),
+    append(LX, LY, List).
+
+valid_and_formula(Var) :-
+    atom(Var), !.
+
+valid_and_formula(si(X, Y)) :-
+    valid_and_formula(X),
+    valid_and_formula(Y).
+
+assoc_and(Phi, Psi) :-
+    valid_and_formula(Phi),
+    valid_and_formula(Psi),
+    flatten_and(Phi, L1),
+    flatten_and(Psi, L2),
+    L1 == L2.   % ordinea trebuie să fie exact aceeași
+
+
+b)
+
+flatten_and(Var, [Var]) :-
+    atom(Var), !.
+
+flatten_and(si(X, Y), List) :-
+    flatten_and(X, LX),
+    flatten_and(Y, LY),
+    append(LX, LY, List).
+
+build_right_assoc([X], X).                   % Un singur element ⇒ variabilă
+build_right_assoc([H|T], si(H, R)) :-        % Construcție recursivă la dreapta
+    build_right_assoc(T, R).
+
+assoc_and_right(Phi, Psi) :-
+    flatten_and(Phi, Vars),                 % extragem variabilele în ordine
+    build_right_assoc(Vars, Psi).           % reconstruim cu paranteze la dreapta
+
