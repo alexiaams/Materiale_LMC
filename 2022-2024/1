@@ -1,0 +1,23 @@
+1.  % consec(+L)
+% adevărat dacă L este listă de numere naturale consecutive, crescător
+
+consec([]).          % lista vidă e considerată consecventă (opțional)
+consec([_]).         % o listă cu un singur element e consecventă
+
+consec([X,Y|T]) :-
+    integer(X), X >= 0,
+    integer(Y), Y >= 0,
+    Y is X + 1,       % Y trebuie să fie imediat după X
+    consec([Y|T]).    % recursiv verificăm restul listei
+
+2.
+% lista_angajati(+ListaAngajati, +SalariuPrag, -ListaRezultat)
+% ListaRezultat conține numele angajaților cu salariul > SalariuPrag
+
+lista_angajati([], _, []).
+lista_angajati([angajat(Nume, Salariu) | T], SalariuPrag, [Nume | R]) :-
+    Salariu > SalariuPrag,
+    lista_angajati(T, SalariuPrag, R).
+lista_angajati([angajat(_, Salariu) | T], SalariuPrag, R) :-
+    Salariu =< SalariuPrag,
+    lista_angajati(T, SalariuPrag, R).
