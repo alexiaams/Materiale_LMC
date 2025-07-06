@@ -1,0 +1,68 @@
+1. % removeEven(+L, -R)
+% R este lista obținută din L după eliminarea elementelor de pe poziții pare (0, 2, 4, ...)
+
+removeEven(L, R) :-
+    removeEven_helper(L, 0, R).
+
+% removeEven_helper(+Listă, +IndexCurent, -Rezultat)
+removeEven_helper([], _, []).
+removeEven_helper([_Elem|T], Index, R) :-
+    0 is Index mod 2,           % poziție pară -> eliminăm elementul curent
+    NextIndex is Index + 1,
+    removeEven_helper(T, NextIndex, R).
+removeEven_helper([Elem|T], Index, [Elem|R]) :-
+    1 is Index mod 2,           % poziție impară -> păstrăm elementul
+    NextIndex is Index + 1,
+    removeEven_helper(T, NextIndex, R).
+
+2. % mergePts(+L1, +L2, -R)
+% R este lista rezultat obținută prin interclasarea listelor L1 și L2 ordonate crescător după coordonata Y,
+% păstrând toate elementele (multiplicitatea).
+
+mergePts([], L, L).
+mergePts(L, [], L).
+
+mergePts([p(X1, Y1) | T1], [p(X2, Y2) | T2], [p(X1, Y1) | R]) :-
+    Y1 =< Y2,
+    mergePts(T1, [p(X2, Y2) | T2], R).
+
+mergePts([p(X1, Y1) | T1], [p(X2, Y2) | T2], [p(X2, Y2) | R]) :-
+    Y1 > Y2,
+    mergePts([p(X1, Y1) | T1], T2, R).
+
+3. % noDuplicateVar(+Phi)
+% verifică dacă formula Phi nu conține variabile duplicate
+
+noDuplicateVar(Phi) :-
+    vars_in_formula(Phi, Vars),
+    no_duplicates(Vars).
+
+% vars_in_formula(+Formula, -Vars)
+% extrage lista variabilelor din Formula
+
+vars_in_formula(Phi, [Phi]) :-
+    atomic(Phi),     % Phi este o variabilă atomică (ex: a, b, c)
+    !.
+
+vars_in_formula(si(P1, P2), Vars) :-
+    vars_in_formula(P1, Vars1),
+    vars_in_formula(P2, Vars2),
+    append(Vars1, Vars2, Vars).
+
+vars_in_formula(sau(P1, P2), Vars) :-
+    vars_in_formula(P1, Vars1),
+    vars_in_formula(P2, Vars2),
+    append(Vars1, Vars2, Vars).
+
+vars_in_formula(imp(P1, P2), Vars) :-
+    vars_in_formula(P1, Vars1),
+    vars_in_formula(P2, Vars2),
+    append(Vars1, Vars2, Vars).
+
+% no_duplicates(+List)
+% adevărat dacă List nu conține duplicate
+
+no_duplicates([]).
+no_duplicates([H|T]) :-
+    \+ member(H, T),
+    no_duplicates(T).
