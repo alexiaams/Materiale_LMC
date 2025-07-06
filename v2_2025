@@ -1,0 +1,92 @@
+1.
+
+expand_intervals([], []).  % Cazul de bază
+
+expand_intervals([(N,M)|T], [List | R]) :-
+    build_list(N, M, List),          % construiește lista (N, M]
+    expand_intervals(T, R).          % recursiv pentru restul
+
+build_list(N, M, []) :-
+    N >= M, !.                       % dacă N ≥ M ⇒ listă vidă
+
+build_list(N, M, [Next | Rest]) :-
+    Next is N + 1,
+    Next =< M,
+    build_list(Next, M, Rest).
+                                                           
+2.
+
+div_concat(L, R) :-
+    append(L1, L2, L),              % L = L1 ++ L2
+    L1 \= [], L2 \= [],             % ambele non-vide
+    append(L2, L1, R),              % R = L2 ++ L1
+    L \= R,                         % R trebuie să fie diferit de L
+    length(L, Len),
+    length(L1, Len1),
+    length(L2, Len2),
+    ( length_divides(Len1, Len)
+    ; length_divides(Len2, Len)
+    ).
+
+length_divides(Divisor, Number) :-
+    Divisor > 0,
+    0 is Number mod Divisor.
+
+
+3.
+                                                           a)
+assoc_or(Phi, Psi) :-
+    flatten_or(Phi, List),      % extragem lista de variabile din Phi
+    flatten_or(Psi, List),      % extragem lista de variabile din Psi
+    build_right_or(List, PhiR), % reconstruim Phi în formă right-associative
+    build_right_or(List, PsiR), % reconstruim Psi în formă right-associative
+    PhiR = PsiR.                % comparăm formele reconstruite
+
+% flatten_or(+Formula, -List)
+% extrage lista variabilelor din formula de disjuncții
+
+flatten_or(sau(A, B), List) :-
+    flatten_or(A, LA),
+    flatten_or(B, LB),
+    append(LA, LB, List).
+flatten_or(Var, [Var]) :-
+    atomic(Var).
+
+% build_right_or(+List, -Formula)
+% construiește formula asociativă la dreapta din lista variabilelor
+
+build_right_or([X], X).
+build_right_or([H|T], sau(H, Rest)) :-
+    build_right_or(T, Rest).
+                                                     
+                                                        
+b)
+% assoc_or_right(+Phi, -Psi)
+% Psi este rezultatul reasocierii la dreapta a lui Phi
+
+assoc_or_right(Var, Var) :-
+    atomic(Var).
+
+assoc_or_right(sau(A, B), Psi) :-
+    % Reasociem recursiv stânga și dreapta
+    assoc_or_right(A, ARight),
+    assoc_or_right(B, BRight),
+
+    % Aplatizăm în listă variabilele din formula recompusă
+    flatten_or(sau(ARight, BRight), Vars),
+
+    % Reconstruim formula cu asociere la dreapta
+    build_right_or(Vars, Psi).
+
+% flatten_or(+Formula, -ListVariabile)
+flatten_or(sau(A, B), List) :-
+    flatten_or(A, LA),
+    flatten_or(B, LB),
+    append(LA, LB, List).
+flatten_or(Var, [Var]) :-
+    atomic(Var).
+
+% build_right_or(+ListaVariabile, -FormulaCuParantezeLaDreapta)
+build_right_or([X], X).
+build_right_or([H|T], sau(H, Rest)) :-
+    build_right_or(T, Rest).
