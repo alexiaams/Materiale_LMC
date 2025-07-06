@@ -1,0 +1,23 @@
+1. % consec(+L)
+% adevărat dacă L este listă de numere naturale consecutive în ordine descrescătoare
+
+consec([]).          % lista vidă e consecventă
+consec([_]).         % lista cu un singur element e consecventă
+
+consec([X, Y | T]) :-
+    integer(X), X >= 0,
+    integer(Y), Y >= 0,
+    X is Y + 1,       % X trebuie să fie exact cu 1 mai mare decât Y
+    consec([Y | T]).  % verificăm recursiv restul listei
+
+
+2. % listare_studenti(+ListaStudenti, +PragNota, -ListareRezultat)
+% ListareRezultat conține numele studenților cu nota < PragNota
+
+listare_studenti([], _, []).
+listare_studenti([student(Nume, Nota) | T], PragNota, [Nume | R]) :-
+    Nota < PragNota,
+    listare_studenti(T, PragNota, R).
+listare_studenti([student(_, Nota) | T], PragNota, R) :-
+    Nota >= PragNota,
+    listare_studenti(T, PragNota, R).
