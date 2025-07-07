@@ -34,7 +34,7 @@ length_divides(Divisor, Number) :-
 
 
 3.
-                                                           a)
+a)
 assoc_or(Phi, Psi) :-
     flatten_or(Phi, List),      % extragem lista de variabile din Phi
     flatten_or(Psi, List),      % extragem lista de variabile din Psi
