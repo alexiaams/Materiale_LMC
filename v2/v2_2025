@@ -90,3 +90,4 @@ flatten_or(Var, [Var]) :-
 build_right_or([X], X).
 build_right_or([H|T], sau(H, Rest)) :-
     build_right_or(T, Rest).
+lalal
